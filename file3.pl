@@ -4,14 +4,12 @@
 use open ':std', ':encoding(UTF-8)';
 use DBI;
 use encoding 'utf8';
-use DateTime;
-use Time::Local;
 
-sub DataPars{
-my ($yyyy, $mm, $dd, $SS, $MM, $HH)=($timestamap =~ m/(\d+)-(\d+)-(\d+)\s+(\d+):(\d+):(\d+)/);
-return ($yyyy, $mm, $dd, $SS, $MM, $HH);
-#printf ("%-d - %-d - %-d  %-d : %-d : %-d\n", $yyyy, $mm, $dd, $SS, $MM, $HH);
-}
+use Data::Dumper; 
+use DateTime;
+#use DateTime::Format::Strptime;
+use DateTime::Duration;
+use Time::Local;
 
 my $dsn = 'DBI:mysql:esap:10.1.4.52';
 my $db_user_name = 'esap';
@@ -25,74 +23,68 @@ $sth = $dbh->prepare( $sql );
 $sth->execute();
 
 while ( ($id, $uid, $level, $messaqe, $timestamap) = $sth->fetchrow_array) {
-	($yyyy1, $mm1, $dd1, $SS1, $MM1, $HH1)=($timestamap =~ m/(\d+)-(\d+)-(\d+)\s+(\d+):(\d+):(\d+)/);
-	#  printf ("%-10d %-10d %-10s %-10s %-10s\n", $id, $uid, $level, $messaqe, $timestamap);
-	# print "\n";
-	# my ($Ey, $Em, $Ed, $ES, $EM, $EH)=DataPars($timestamap);
-}
-# printf ("%-d - %-d - %-d  %-d : %-d : %-d\n", $Ey, $Em, $Ed, $ES, $EM, $EH);
+	($yyyy1, $mm1, $dd1, $HH1, $MM1, $SS1)=($timestamap =~ m/(\d+)-(\d+)-(\d+)\s+(\d+):(\d+):(\d+)/);
 
+	 $dt = DateTime->new(
+    year      => $yyyy1,
+    month     => $mm1,
+    day       => $dd1,
+    hour      => $HH1,
+    minute    => $MM1,
+	second     => $SS1,
+);
+	# $dt_format = DateTime::Format::Strptime->new( pattern  => '%Y-%m-%d\s+%H:%M:%S',);
+	# $dt = $dt_format->parse_datetime($timestamap);
+	 printf ("%-10d %-10d %-10s %-10s %-10s\n", $id, $uid, $level, $messaqe, $timestamap);
+	 print "\n";
+	
+}
 
  $sql=qq(SELECT * FROM log ORDER BY id LIMIT 1);#первая строка из таблицы
  $sth = $dbh->prepare( $sql );
 $sth->execute();
 
 while ( ($id, $uid, $level, $messaqe, $timestamap) = $sth->fetchrow_array) {
-	($yyyy, $mm, $dd, $SS, $MM, $HH)=($timestamap =~ m/(\d+)-(\d+)-(\d+)\s+(\d+):(\d+):(\d+)/);
-	# printf ("%-10d %-10d %-10s %-10s %-10s\n", $id, $uid, $level, $messaqe, $timestamap);
-	# print "\n";
-	# my ($Fy, $Fm, $Fd, $FS, $FM, $FH)=DataPars($timestamap);
+	($yyyy2, $mm2, $dd2, $HH2, $MM2, $SS2)=($timestamap =~ m/(\d+)-(\d+)-(\d+)\s+(\d+):(\d+):(\d+)/);
+	 $dt2 = DateTime->new(
+    year      => $yyyy2,
+    month     => $mm2,
+    day       => $dd2,
+    hour      => $HH2,
+    minute    => $MM2,
+	second     => $SS2,
+);
+	 printf ("%-10d %-10d %-10s %-10s %-10s\n", $id, $uid, $level, $messaqe, $timestamap);
+	print "\n";
+
 }
-# printf ("%-d - %-d - %-d  %-d : %-d : %-d\n", $Fy, $Fm, $Fd, $FS, $FM, $FH);
-use Date::Calc qw(Delta_Days);
-$count_days= Delta_Days($yyyy1, $mm1, $dd1, $yyyy, $mm, $dd);
-print $count_days."\n";
-my $date=($yyyy."-".$mm."-".$dd." ".$SS.":".$MM.":".$HH);
-print $date."\n";    
-DateTime $date = DateTime.Now.AddDays(1); 
-print $date."\n";
 
-# $maxi=100;
-# for($i=0;$i<$maxi;$i++){
-# $date='2013-09-06%';
-# $sql=qq(SELECT * FROM log WHERE  timestamap like $date);
-# $sth = $dbh->prepare( $sql );
-# $sth->execute();
+# Прибавить1 день 
+my $dt_duration = DateTime::Duration->new(
+    years   => 0,
+    months  => 0,
+    days    => 1,
+    hours   => 0,
+    minutes => 0,
+    seconds => 0,
+);
+#   $dt2 = $dt + $dt_duration;
 
-# while ( ($id, $uid, $level, $messaqe, $timestamap) = $sth->fetchrow_array) {
-# 	 printf ("%-10d %-10d %-10s %-10s %-10s\n", $id, $uid, $level, $messaqe, $timestamap);
-# 	print "\n";
-	
-# }
-#  DateTime $date = DateTime.Now.AddDays(1); 
-# }
+#   print $dt2->year."\n";
+#   print $dt2->month."\n";
+#   print $dt2->day."\n";
+#   print $dt2->hour."\n";
+#   print $dt2->minute."\n";
+#   print $dt2->second."\n";
 
+  # Сравнить даты
+# my $result = DateTime->compare( $dt, $dt2 ); # результат: -1 т. к. $dt < $dt2
 
-# my $sql=qq(SELECT *
-#            FROM log WHERE  timestamap like '2013-09-06%');
+# Интервал между датами
+$interval = $dt2->delta_days( $dt );
 
-# my $sth = $dbh->prepare( $sql );
+print $interval."\n";
+print $se = ($dt - $dt2)->years;
 
-# $sth->execute();
-
-# while ( my($id, $uid, $level, $messaqe, $timestamap) = $sth->fetchrow_array) {
-# 	printf ("%-10d %-10d %-10s %-10s %-10s\n", $id, $uid, $level, $messaqe, $timestamap);
-# 	print "\n";
-# }
 
 $dbh->disconnect();
-#
-# my $sth=$dbh->prepare($sql);
-# $sth->execute();  
-# my (@matrix) = ();
-# while (my @ary = $sth->fetchrow_array())
-# {
-#     push(@matrix, [@ary]);  # [@ary] это ссылка
-# }
-# $sth->finish();
-#    $dbh->disconnect();
-
-#    foreach (@matrix)
-#    {
-#        print $_."\n";
-#    }
